@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from youtube_data import get_video_stats, write_to_csv
 
 # Cache the YouTube data fetching to avoid repeated API calls
 @st.cache_data(ttl=86400)  # Cache for 1 day
