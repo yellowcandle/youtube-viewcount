@@ -10,21 +10,6 @@ def get_cached_video_stats(video_id):
 # Streamlit app
 st.set_page_config(page_title=" YouTube MV 觀看次數", layout="wide")
 
-# Update YouTube stats
-if st.button('Update YouTube Statistics'):
-    with st.spinner('Fetching latest YouTube data...'):
-        video_ids = df[df['youtube_id'].notna()]['youtube_id']
-        progress_bar = st.progress(0)
-        
-        for i, video_id in enumerate(video_ids):
-            title, views, date = get_cached_video_stats(video_id)
-            if views and date:
-                write_to_csv(video_id, title, views, date)
-            progress_bar.progress((i + 1) / len(video_ids))
-        
-        st.success('YouTube statistics updated successfully!')
-        st.rerun()
-
 # Display latest YouTube view count
 st.title("Latest YouTube Statistics")
 st.markdown("Displaying the latest statistics for the specified YouTube video:")

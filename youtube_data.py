@@ -6,7 +6,7 @@ import dotenv
 
 dotenv.load_dotenv()
 
-video_ids = '4d7a8jEW3K4',
+video_id = '4d7a8jEW3K4'
 
 def get_video_stats(video_id):
     """
@@ -53,7 +53,7 @@ def get_video_stats(video_id):
 
 def write_to_csv(video_id, title, views, upload_date):
     """
-    Write YouTube video statistics back to data.csv file.
+    Print YouTube video statistics (simplified version).
     
     Args:
         video_id (str): YouTube video ID
@@ -62,28 +62,15 @@ def write_to_csv(video_id, title, views, upload_date):
         upload_date (str): Upload date in YYYY-MM-DD format
     """
     try:
-        # Read existing CSV file
-        df = pd.read_csv('data.csv')
-        df.columns = df.columns.str.strip()
+        # Calculate views per day
+        days_since_upload = (datetime.now() - datetime.strptime(upload_date, '%Y-%m-%d')).days
+        views_per_day = round(views / days_since_upload) if days_since_upload > 0 else views
         
-        # Find the row with matching video_id
-        mask = df['youtube_id'] == video_id
-        
-        if mask.any():
-            # Update existing row
-            df.loc[mask, 'youtube_views'] = views
-            df.loc[mask, 'youtube_date'] = upload_date
-            
-            # Calculate and update views per day
-            days_since_upload = (datetime.now() - datetime.strptime(upload_date, '%Y-%m-%d')).days
-            views_per_day = round(views / days_since_upload) if days_since_upload > 0 else views
-            df.loc[mask, 'view per day'] = views_per_day
-            
-            # Write back to CSV
-            df.to_csv('data.csv', index=False)
-            print(f"Successfully updated statistics for video: {title}")
-        else:
-            print(f"Warning: No matching video ID found in CSV: {video_id}")
+        print(f"Video: {title}")
+        print(f"ID: {video_id}")
+        print(f"Views: {views:,}")
+        print(f"Upload Date: {upload_date}")
+        print(f"Views Per Day: {views_per_day:,}")
             
     except Exception as e:
-        print(f"Error writing to CSV: {str(e)}")
+        print(f"Error processing video data: {str(e)}")
