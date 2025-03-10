@@ -1,5 +1,54 @@
 import streamlit as st
 import pandas as pd
+from googleapiclient.discovery import build
+from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Get YouTube API key from environment variable
+API_KEY = os.getenv("YOUTUBE_API_KEY")
+
+def get_video_stats(video_id):
+    """
+    Fetch YouTube video statistics using the YouTube Data API
+    
+    Args:
+        video_id (str): YouTube video ID
+        
+    Returns:
+        tuple: (title, view_count, upload_date) or (None, None, None) if error occurs
+    """
+    try:
+        # Create YouTube API client
+        youtube = build('youtube', 'v3', developerKey=API_KEY)
+        
+        # Get video details
+        video_response = youtube.videos().list(
+            part='snippet,statistics',
+            id=video_id
+        ).execute()
+        
+        # Check if video exists
+        if not video_response['items']:
+            return None, None, None
+            
+        # Extract relevant information
+        video_data = video_response['items'][0]
+        title = video_data['snippet']['title']
+        view_count = int(video_data['statistics']['viewCount'])
+        
+        # Format the upload date
+        upload_date_raw = video_data['snippet']['publishedAt']
+        upload_date = datetime.fromisoformat(upload_date_raw.replace('Z', '+00:00')).strftime('%Y-%m-%d')
+        
+        return title, view_count, upload_date
+        
+    except Exception as e:
+        st.error(f"Error fetching video statistics: {e}")
+        return None, None, None
 
 # Cache the YouTube data fetching to avoid repeated API calls
 @st.cache_data(ttl=86400)  # Cache for 1 day
